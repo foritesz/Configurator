@@ -1,0 +1,42 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: wot-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    build:
+      context: .
+      dockerfile: BackEnd/Dockerfile
+    container_name: wot-backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./BackEnd/.env
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017
+      - MONGODB_DB=wotdb
+      - REPOSITORIES_ROOT=/app/Repositories
+      - LOG_DIR=/app/Logs
+    depends_on:
+      - mongo
+    volumes:
+      - ./Repositories:/app/Repositories
+      - ./Logs:/app/Logs
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./FrontEnd/Dockerfile
+    container_name: wot-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:

@@ -1,0 +1,21 @@
+# Visual Studio
+.vs/
+
+# Logs (root szinten)
+Logs/
+
+Repositories/
+
+# Backend repository data (tank fájlok stb.)
+BackEnd/Repositories/
+
+# Ha több repo mappád van külön:
+BackEnd/Repositories/TestXml/
+BackEnd/Repositories/Bonus/
+BackEnd/Repositories/TankData/
+
+FrontEnd/obj/
+
+# Opcionális: minden log bárhol
+*.log
+.env

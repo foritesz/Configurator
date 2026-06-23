@@ -1,0 +1,13 @@
+C:\Projects\C#\WotBriefingRoom\WotBriefingRoom\FrontEnd\publish\publish\web.config
+C:\Projects\C#\WotBriefingRoom\WotBriefingRoom\FrontEnd\publish\publish\emcc-props.json
+C:\Projects\C#\WotBriefingRoom\WotBriefingRoom\FrontEnd\publish\publish\FrontEnd.staticwebassets.endpoints.json
+C:\Projects\C#\WotBriefingRoom\WotBriefingRoom\FrontEnd\publish\publish\publish\emcc-props.json
+C:\Projects\C#\WotBriefingRoom\WotBriefingRoom\FrontEnd\publish\publish\publish\FrontEnd.staticwebassets.endpoints.json
+C:\Projects\C#\WotBriefingRoom\WotBriefingRoom\FrontEnd\publish\publish\publish\wwwroot\appsettings.json
+C:\Projects\C#\WotBriefingRoom\WotBriefingRoom\FrontEnd\publish\publish\publish\wwwroot\sample-data\weather.json
+C:\Projects\C#\WotBriefingRoom\WotBriefingRoom\FrontEnd\publish\publish\publish\wwwroot\_framework\blazor.boot.json
+C:\Projects\C#\WotBriefingRoom\WotBriefingRoom\FrontEnd\publish\publish\wwwroot\appsettings.json
+C:\Projects\C#\WotBriefingRoom\WotBriefingRoom\FrontEnd\publish\publish\wwwroot\sample-data\weather.json
+C:\Projects\C#\WotBriefingRoom\WotBriefingRoom\FrontEnd\publish\publish\wwwroot\_framework\blazor.boot.json
+C:\Projects\C#\WotBriefingRoom\WotBriefingRoom\FrontEnd\publish\emcc-props.json
+C:\Projects\C#\WotBriefingRoom\WotBriefingRoom\FrontEnd\publish\web.config

@@ -1,0 +1,88 @@
+name: dockercompose434550024337170792
+services:
+  backend:
+    depends_on:
+      mongo:
+        condition: service_healthy
+        required: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+      Mongo__ConnectionString: mongodb://mongo:27017/wbr
+    image: wotbriefingroom-backend
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "9090"
+        protocol: tcp
+      - mode: ingress
+        target: 8080
+        published: "9092"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\Wqeesda\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\Wqeesda\AppData\Roaming/Microsoft/UserSecrets
+        target: /root/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\Wqeesda\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\Wqeesda\AppData\Roaming/ASP.NET/Https
+        target: /root/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  frontend:
+    depends_on:
+      backend:
+        condition: service_started
+        required: true
+    image: wotbriefingroom-frontend
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "3000"
+        protocol: tcp
+  mongo:
+    healthcheck:
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - --eval
+        - 'db.runCommand({ ping: 1 }).ok'
+      timeout: 3s
+      interval: 5s
+      retries: 30
+    image: mongo:7
+    networks:
+      default: null
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: mongo-data
+        target: /data/db
+        volume: {}
+networks:
+  default:
+    name: dockercompose434550024337170792_default
+volumes:
+  mongo-data:
+    name: dockercompose434550024337170792_mongo-data

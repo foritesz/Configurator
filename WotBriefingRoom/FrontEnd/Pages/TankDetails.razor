@@ -1,0 +1,1972 @@
+﻿@page "/tanks/{id:int}"
+@using System.Net.Http.Json
+@using DTO
+@using BonusModels.BonusModels   @* <-- tedd át a bónusz modelleket is a DTO projektbe *@
+@using DTO.TanksModels
+@using System.Globalization
+@using FrontEnd.Services.CrewServices
+@inject HttpClient Http
+@inject CrewSkillService CrewSkillService
+
+
+
+<!-- ======= Canvas szekció ======= -->
+<section class="canvas-wrap">
+    <canvas id="scene"></canvas>
+    <div id="hudLayer" class="hud-layer" aria-hidden="false"></div>
+</section>
+
+<!-- Mobil: szekciók (Szűrők + Mátrix) megjelenítése/elrejtése -->
+<button id="sectionsToggle" class="mobile-sections-toggle i-category" type="button" aria-controls="controlsRow" aria-expanded="false">Filter</button>
+
+<!-- ======= SZŰRŐK / KONTROLLOK (ÚJ) ======= -->
+<section id="controlsRow" class="controls-row">
+    <section class="filters" aria-label="Szűrők">
+        <div class="filters-top" style="justify-content:center; flex-wrap:wrap;">
+            <!-- 4-es csoport -->
+            <div class="group">
+                <select class="icon-select i-susp" @bind="selectedGunKey"
+                        aria-label="Gun" style="background-image:url('/images/moduls/gun.png')">
+                    @if (tank?.Guns != null)
+                    {
+                        @foreach (var gun in tank.Guns.Keys)
+                        {
+                            <option value="@gun">@gun</option>
+                        }
+                    }
+                </select>
+
+                <select class="icon-select i-country" @bind="selectedTurretKey"
+                        aria-label="Turret" style="background-image:url('/images/moduls/towerBig.png')">
+                    @if (tank?.Turrets0 != null)
+                    {
+                        @foreach (var turret in tank.Turrets0.Keys)
+                        {
+                            <option value="@turret">@turret</option>
+                        }
+                    }
+                </select>
+
+                <select class="icon-select i-year" @bind="selectedEngineKey"
+                        aria-label="Engine" style="background-image:url('/images/moduls/engineBig.png')">
+                    @if (tank?.Engines != null)
+                    {
+                        @foreach (var engine in tank.Engines.Keys)
+                        {
+                            <option value="@engine">@engine</option>
+                        }
+                    }
+                </select>
+
+                <select class="icon-select i-state" @bind="selectedChassisKey"
+                        aria-label="Chassis" style="background-image:url('/images/moduls/chassis.png')">
+                    @if (tank?.Chassis != null)
+                    {
+                        @foreach (var chassis in tank.Chassis.Keys)
+                        {
+                            <option value="@chassis">@chassis</option>
+                        }
+                    }
+                </select>
+            </div>
+            <!-- 3-as csoport -->
+            <div class="group">
+                <div class="rich-select" data-name="ammo">
+                    <button class="rs-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                        <div class="rs-img-stack">
+                            <img src="/images/directives/boosterSign.png" class="bg" alt="">
+                            <img src="/images/equipments/improvedVentilation_tier2.png" class="fg" alt="">
+                        </div>
+                    </button>
+                    <div class="rs-panel" role="listbox">
+                        <div class="rs-option" role="option" data-value="ap">
+                            <img src="/images/ammo/ARMOR_PIERCING.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">Armor Piercing (AP)</div>
+                                Nagy sűrűségű, kemény lövedékmag.
+
+
+                                • Páncélátütés jó közepes távon.
+
+
+                                • Olcsóbb, széles körben elérhető.
+
+
+                                • Minimális robbanó hatás.
+
+
+                                • Foglalat: 120 mm L/44–L/55.
+
+
+                                • Ajánlott: alap célpontok ellen.
+
+
+                                • Korlát: ferde páncélon lepattanás.
+
+
+                                • Megjegyzés: KE csapás, nincs hőhatás.
+                            </div>
+                        </div>
+                        <div class="rs-option" role="option" data-value="apcr">
+                            <img src="/images/ammo/APCR.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">APCR</div>
+                                Nagy kezdősebesség, kemény volfrám mag.
+
+
+                                • Kiváló átütés rövid/közepes távolságon.
+
+
+                                • Gyors, lapos röppálya.
+
+
+                                • Távolsággal csökkenő hatás.
+
+
+                                • Korlát: reaktív páncél ellen mérsékeltebb.
+                            </div>
+                        </div>
+                        <div class="rs-option" role="option" data-value="heat">
+                            <img src="/images/ammo/HEAT.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">HEAT</div>
+                                Kumulatív töltet, páncélt átégő sugárral.
+
+
+                                • Jó átütés távolságtól függetlenül.
+
+
+                                • ERA csökkentheti a hatást.
+
+
+                                • Érzékeny rácsokra/hálókra.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rich-select" data-name="ammo">
+                    <button class="rs-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                        <div class="rs-img-stack">
+                            <img src="/images/directives/boosterSign.png" class="bg" alt="">
+                            <img src="/images/equipments/improvedVentilation_tier2.png" class="fg" alt="">
+                        </div>
+                    </button>
+                    <div class="rs-panel" role="listbox">
+                        <div class="rs-option" role="option" data-value="ap">
+                            <img src="ammo/ARMOR_PIERCING.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">Armor Piercing (AP)</div>
+                                Nagy sűrűségű, kemény lövedékmag.
+
+
+                                • Páncélátütés jó közepes távon.
+
+
+                                • Olcsóbb, széles körben elérhető.
+
+
+                                • Minimális robbanó hatás.
+
+
+                                • Foglalat: 120 mm L/44–L/55.
+
+
+                                • Ajánlott: alap célpontok ellen.
+
+
+                                • Korlát: ferde páncélon lepattanás.
+
+
+                                • Megjegyzés: KE csapás, nincs hőhatás.
+                            </div>
+                        </div>
+                        <div class="rs-option" role="option" data-value="apcr">
+                            <img src="/images/ammo/APCR.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">APCR</div>
+                                Nagy kezdősebesség, kemény volfrám mag.
+
+
+                                • Kiváló átütés rövid/közepes távolságon.
+
+
+                                • Gyors, lapos röppálya.
+
+
+                                • Távolsággal csökkenő hatás.
+
+
+                                • Korlát: reaktív páncél ellen mérsékeltebb.
+                            </div>
+                        </div>
+                        <div class="rs-option" role="option" data-value="heat">
+                            <img src="/images/ammo/HEAT.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">HEAT</div>
+                                Kumulatív töltet, páncélt átégő sugárral.
+
+
+                                • Jó átütés távolságtól függetlenül.
+
+
+                                • ERA csökkentheti a hatást.
+
+
+                                • Érzékeny rácsokra/hálókra.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rich-select" data-name="ammo">
+                    <button class="rs-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                        <div class="rs-img-stack">
+                            <img src="/images/directives/boosterSign.png" class="bg" alt="">
+                            <img src="/images/equipments/improvedVentilation_tier2.png" class="fg" alt="">
+                        </div>
+                    </button>
+                    <div class="rs-panel" role="listbox">
+                        <div class="rs-option" role="option" data-value="ap">
+                            <img src="/images/ammo/ARMOR_PIERCING.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">Armor Piercing (AP)</div>
+                                Nagy sűrűségű, kemény lövedékmag.
+
+
+                                • Páncélátütés jó közepes távon.
+
+
+                                • Olcsóbb, széles körben elérhető.
+
+
+                                • Minimális robbanó hatás.
+
+
+                                • Foglalat: 120 mm L/44–L/55.
+
+
+                                • Ajánlott: alap célpontok ellen.
+
+
+                                • Korlát: ferde páncélon lepattanás.
+
+
+                                • Megjegyzés: KE csapás, nincs hőhatás.
+                            </div>
+                        </div>
+                        <div class="rs-option" role="option" data-value="apcr">
+                            <img src="/images/ammo/APCR.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">APCR</div>
+                                Nagy kezdősebesség, kemény volfrám mag.
+
+
+                                • Kiváló átütés rövid/közepes távolságon.
+
+
+                                • Gyors, lapos röppálya.
+
+
+                                • Távolsággal csökkenő hatás.
+
+
+                                • Korlát: reaktív páncél ellen mérsékeltebb.
+                            </div>
+                        </div>
+                        <div class="rs-option" role="option" data-value="heat">
+                            <img src="/images/ammo/HEAT.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">HEAT</div>
+                                Kumulatív töltet, páncélt átégő sugárral.
+
+
+                                • Jó átütés távolságtól függetlenül.
+
+
+                                • ERA csökkentheti a hatást.
+
+
+                                • Érzékeny rácsokra/hálókra.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 3-as csoport -->
+            <div class="group">
+                <div class="rich-select" data-name="ammo">
+                    <button class="rs-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                        <img src="/images/ammo/ARMOR_PIERCING.png" alt="">
+                    </button>
+                    <div class="rs-panel" role="listbox">
+                        <div class="rs-option" role="option" data-value="ap">
+                            <img src="/images/ammo/ARMOR_PIERCING.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">Armor Piercing (AP)</div>
+                                Nagy sűrűségű, kemény lövedékmag.
+
+
+                                • Páncélátütés jó közepes távon.
+
+
+                                • Olcsóbb, széles körben elérhető.
+
+
+                                • Minimális robbanó hatás.
+
+
+                                • Foglalat: 120 mm L/44–L/55.
+
+
+                                • Ajánlott: alap célpontok ellen.
+
+
+                                • Korlát: ferde páncélon lepattanás.
+
+
+                                • Megjegyzés: KE csapás, nincs hőhatás.
+                            </div>
+                        </div>
+                        <div class="rs-option" role="option" data-value="apcr">
+                            <img src="/images/ammo/APCR.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">APCR</div>
+                                Nagy kezdősebesség, kemény volfrám mag.
+
+
+                                • Kiváló átütés rövid/közepes távolságon.
+
+
+                                • Gyors, lapos röppálya.
+
+
+                                • Távolsággal csökkenő hatás.
+
+
+                                • Korlát: reaktív páncél ellen mérsékeltebb.
+                            </div>
+                        </div>
+                        <div class="rs-option" role="option" data-value="heat">
+                            <img src="/images/ammo/HEAT.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">HEAT</div>
+                                Kumulatív töltet, páncélt átégő sugárral.
+
+
+                                • Jó átütés távolságtól függetlenül.
+
+
+                                • ERA csökkentheti a hatást.
+
+
+                                • Érzékeny rácsokra/hálókra.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rich-select" data-name="ammo">
+                    <button class="rs-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                        <img src="/images/ammo/ARMOR_PIERCING.png" alt="">
+                    </button>
+                    <div class="rs-panel" role="listbox">
+                        <div class="rs-option" role="option" data-value="ap">
+                            <img src="ammo/ARMOR_PIERCING.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">Armor Piercing (AP)</div>
+                                Nagy sűrűségű, kemény lövedékmag.
+
+
+                                • Páncélátütés jó közepes távon.
+
+
+                                • Olcsóbb, széles körben elérhető.
+
+
+                                • Minimális robbanó hatás.
+
+
+                                • Foglalat: 120 mm L/44–L/55.
+
+
+                                • Ajánlott: alap célpontok ellen.
+
+
+                                • Korlát: ferde páncélon lepattanás.
+
+
+                                • Megjegyzés: KE csapás, nincs hőhatás.
+                            </div>
+                        </div>
+                        <div class="rs-option" role="option" data-value="apcr">
+                            <img src="/images/ammo/APCR.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">APCR</div>
+                                Nagy kezdősebesség, kemény volfrám mag.
+
+
+                                • Kiváló átütés rövid/közepes távolságon.
+
+
+                                • Gyors, lapos röppálya.
+
+
+                                • Távolsággal csökkenő hatás.
+
+
+                                • Korlát: reaktív páncél ellen mérsékeltebb.
+                            </div>
+                        </div>
+                        <div class="rs-option" role="option" data-value="heat">
+                            <img src="/images/ammo/HEAT.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">HEAT</div>
+                                Kumulatív töltet, páncélt átégő sugárral.
+
+
+                                • Jó átütés távolságtól függetlenül.
+
+
+                                • ERA csökkentheti a hatást.
+
+
+                                • Érzékeny rácsokra/hálókra.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rich-select" data-name="ammo">
+                    <button class="rs-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                        <img src="/images/ammo/ARMOR_PIERCING.png" alt="">
+                    </button>
+                    <div class="rs-panel" role="listbox">
+                        <div class="rs-option" role="option" data-value="ap">
+                            <img src="/images/ammo/ARMOR_PIERCING.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">Armor Piercing (AP)</div>
+                                Nagy sűrűségű, kemény lövedékmag.
+
+
+                                • Páncélátütés jó közepes távon.
+
+
+                                • Olcsóbb, széles körben elérhető.
+
+
+                                • Minimális robbanó hatás.
+
+
+                                • Foglalat: 120 mm L/44–L/55.
+
+
+                                • Ajánlott: alap célpontok ellen.
+
+
+                                • Korlát: ferde páncélon lepattanás.
+
+
+                                • Megjegyzés: KE csapás, nincs hőhatás.
+                            </div>
+                        </div>
+                        <div class="rs-option" role="option" data-value="apcr">
+                            <img src="/images/ammo/APCR.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">APCR</div>
+                                Nagy kezdősebesség, kemény volfrám mag.
+
+
+                                • Kiváló átütés rövid/közepes távolságon.
+
+
+                                • Gyors, lapos röppálya.
+
+
+                                • Távolsággal csökkenő hatás.
+
+
+                                • Korlát: reaktív páncél ellen mérsékeltebb.
+                            </div>
+                        </div>
+                        <div class="rs-option" role="option" data-value="heat">
+                            <img src="/images/ammo/HEAT.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">HEAT</div>
+                                Kumulatív töltet, páncélt átégő sugárral.
+
+
+                                • Jó átütés távolságtól függetlenül.
+
+
+                                • ERA csökkentheti a hatást.
+
+
+                                • Érzékeny rácsokra/hálókra.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 2-es csoport -->
+            <!-- Rich Select demó: kép balra + 10 sor szöveg jobbra -->
+            <div class="group">
+                <div class="rich-select @(isAmmoOpen ? "open" : "")" data-name="ammo">
+                    <button class="rs-trigger"
+                            type="button"
+                            aria-haspopup="listbox"
+                            aria-expanded="@isAmmoOpen.ToString().ToLower()"
+                            @onclick="ToggleAmmoSelect">
+                        <img src="@GetSelectedAmmoImage()" alt="">
+                    </button>
+
+                    <input type="hidden" name="ammo" value="@selectedAmmoType" />
+
+                    @if (isAmmoOpen)
+                    {
+                        <div class="rs-panel" role="listbox" @onclick:stopPropagation="true">
+                            @if (tank?.Ammo != null)
+                            {
+                                @foreach (var ammo in tank.Ammo)
+                                {
+                                    <button type="button"
+                                            class="rs-option"
+                                            role="option"
+                                            @onclick="() => SelectAmmo(ammo)">
+                                        <img src="@GetAmmoImage(ammo.Type)" alt="">
+                                        <div class="rs-text">
+                                            <div class="rs-title">@GetAmmoTitle(ammo.Type)</div>
+                                            <div>Damage: @GetAmmoDamage(ammo)</div>
+                                            <div>Penetration: @GetAmmoPenetration(ammo)</div>
+                                        </div>
+                                    </button>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="rich-select" data-name="ammo">
+                    <button class="rs-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                        <div class="rs-img-stack">
+                            <img src="/images/directives/boosterSign.png" class="bg" alt="">
+                            <img src="/images/equipments/improvedVentilation_tier2.png" class="fg" alt="">
+                        </div>
+                    </button>
+                    <div class="rs-panel" role="listbox">
+                        <div class="rs-option" role="option" data-value="ap">
+                            <img src="directives/ARMOR_PIERCING.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">Armor Piercing (AP)</div>
+                                Nagy sűrűségű, kemény lövedékmag.
+
+
+                                • Páncélátütés jó közepes távon.
+
+
+                                • Olcsóbb, széles körben elérhető.
+
+
+                                • Minimális robbanó hatás.
+
+
+                                • Foglalat: 120 mm L/44–L/55.
+
+
+                                • Ajánlott: alap célpontok ellen.
+
+
+                                • Korlát: ferde páncélon lepattanás.
+
+
+                                • Megjegyzés: KE csapás, nincs hőhatás.
+                            </div>
+                        </div>
+                        <div class="rs-option" role="option" data-value="apcr">
+                            <img src="/images/ammo/APCR.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">APCR</div>
+                                Nagy kezdősebesség, kemény volfrám mag.
+
+
+                                • Kiváló átütés rövid/közepes távolságon.
+
+
+                                • Gyors, lapos röppálya.
+
+
+                                • Távolsággal csökkenő hatás.
+
+
+                                • Korlát: reaktív páncél ellen mérsékeltebb.
+                            </div>
+                        </div>
+                        <div class="rs-option" role="option" data-value="heat">
+                            <img src="/images/ammo/HEAT.png" alt="">
+                            <div class="rs-text">
+                                <div class="rs-title">HEAT</div>
+                                Kumulatív töltet, páncélt átégő sugárral.
+
+
+                                • Jó átütés távolságtól függetlenül.
+
+
+                                • ERA csökkentheti a hatást.
+
+
+                                • Érzékeny rácsokra/hálókra.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Alsó sor: csúszka + 5-ös csoport alul középre -->
+            <div class="filters-bottom"
+                 style="display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:12px; margin-top:20px;">
+                <div class="range-row">
+                    <input id="range1" type="range" min="0" max="10" step="1" value="0" style="width:100px;" />
+                    <output id="range1Out">0</output>
+                </div>
+                <div class="group">
+                    <div class="group">
+                        <button class="icon-btn i-crew" aria-label="Személyzet"
+                                style="background-image:url('/images/fieldmod/additionalGrousers_disabled.png')"></button>
+                        <button class="icon-btn i-crew" aria-label="Személyzet"
+                                style="background-image:url('/images/fieldmod/betterFriction_disabled.png')"></button>
+                    </div>
+                </div>
+                <div class="group">
+                    <button class="icon-btn i-crew" aria-label="Személyzet"
+                            style="background-image:url('/images/fieldmod/improvedScope_disabled.png')"></button>
+                    <button class="icon-btn i-crew" aria-label="Személyzet"
+                            style="background-image:url('/images/fieldmod/improvedAimingHandling_disabled.png')"></button>
+                </div>
+                <div class="group">
+                    <button class="icon-btn i-crew" aria-label="Személyzet"
+                            style="background-image:url('/images/fieldmod/improvedSpallingResistance_disabled.png')"></button>
+                    <button class="icon-btn i-crew" aria-label="Személyzet"
+                            style="background-image:url('/images/fieldmod/improvedObservationDevice_disabled.png')"></button>
+                </div>
+                <div class="group">
+                    <button class="icon-btn i-crew" aria-label="Személyzet"
+                            style="background-image:url('/images/fieldmod/improvedSpallingResistance_disabled.png')"></button>
+                    <button class="icon-btn i-crew" aria-label="Személyzet"
+                            style="background-image:url('/images/fieldmod/improvedSpeedIndicator_disabled.png')"></button>
+                </div>
+                <div class="group">
+                    <button class="icon-btn i-crew" aria-label="Személyzet"
+                            style="background-image:url('/images/fieldmod/increasedThickness_disabled.png')"></button>
+                    <button class="icon-btn i-crew" aria-label="Személyzet"
+                            style="background-image:url('/images/fieldmod/improvedTurretTurningWheels_disabled.png')"></button>
+                </div>
+                <div class="toggles-inline">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="tgA">
+                        <span class="track"><span class="knob"></span></span>
+                        <span class="t-label">Auto</span>
+                    </label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="tgB">
+                        <span class="track"><span class="knob"></span></span>
+                        <span class="t-label">Lock</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Matrix Section (jobb oldalt) -->
+    <section class="matrix" aria-label="Ikon mátrix">
+        <div class="matrix-grid">
+
+            <div class="matrix-row">
+                <div class="icon-cell i-susp" title="Kategória" style="background-image:url('/images/crew/silhouette_mask.png')"></div>
+
+                <button type="button"
+                        class="icon-btn i-country @(IsMatrixActive("102") ? "active" : "")"
+                        aria-label="102"
+                        @onclick='() => ToggleMatrixButton(" 102")'
+                        style="background-image:url('/images/crew/brotherhood.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-year @(IsMatrixActive("repair") ? "active" : "")"
+                        aria-label="Év"
+                        @onclick='() => ToggleMatrixButton(" repair")'
+                        style="background-image:url('/images/crew/repair.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-state @(IsMatrixActive("camouflage") ? "active" : "")"
+                        aria-label="Állapot"
+                        @onclick='() => ToggleMatrixButton(" camouflage")'
+                        style="background-image:url('/images/crew/icon_perk_camouflage.png')">
+                </button>
+            </div>
+
+            <div class="matrix-row">
+                <div class="icon-cell i-armor" title="Védelem" style="background-image:url('/images/crew/commander.png')"></div>
+
+                <button type="button"
+                        class="icon-btn i-fcs @(IsMatrixActive("101") ? "active" : "")"
+                        aria-label="101"
+                        @onclick='() => ToggleMatrixButton("101")'
+                        style="background-image:url('/images/crew/commander_eagleEye.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-fcs @(IsMatrixActive("commander_emergency") ? "active" : "")"
+                        aria-label="FCS"
+                        @onclick='() => ToggleMatrixButton(" commander_emergency")'
+                        style="background-image:url('/images/crew/commander_emergency.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-optics @(IsMatrixActive("commander_tutor") ? "active" : "")"
+                        aria-label="Optika"
+                        @onclick='() => ToggleMatrixButton(" commander_tutor")'
+                        style="background-image:url('/images/crew/commander_tutor.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-speed @(IsMatrixActive("commander_coordination") ? "active" : "")"
+                        aria-label="Sebesség"
+                        @onclick='() => ToggleMatrixButton(" commander_coordination")'
+                        style="background-image:url('/images/crew/commander_coordination.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-weight @(IsMatrixActive("105") ? "active" : "")"
+                        aria-label="105"
+                        @onclick='() => ToggleMatrixButton(" 105")'
+                        style="background-image:url('/images/crew/commander_enemyShotPredictor.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-mfg @(IsMatrixActive("106") ? "active" : "")"
+                        aria-label="106"
+                        @onclick='() => ToggleMatrixButton(" 106")'
+                        style="background-image:url('/images/crew/commander_practical.png')">
+                </button>
+            </div>
+
+            <div class="matrix-row">
+                <div class="icon-cell i-fuel" title="Üzemanyag" style="background-image:url('/images/crew/gunner.png')"></div>
+
+                <button type="button"
+                        class="icon-btn i-gearbox @(IsMatrixActive("201") ? "active" : "")"
+                        aria-label="201"
+                        @onclick='() => ToggleMatrixButton(" 201")'
+                        style="background-image:url('/images/crew/gunner_smoothTurret.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-susp @(IsMatrixActive("202") ? "active" : "")"
+                        aria-label="202"
+                        @onclick='() => ToggleMatrixButton(" 202")'
+                        style="background-image:url('/images/crew/gunner_sniper.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-stab @(IsMatrixActive("203") ? "active" : "")"
+                        aria-label="203"
+                        @onclick='() => ToggleMatrixButton(" 203")'
+                        style="background-image:url('/images/crew/icon_perk_gunner_rancorous.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-crew @(IsMatrixActive("204") ? "active" : "")"
+                        aria-label="204"
+                        @onclick='() => ToggleMatrixButton(" 204")'
+                        style="background-image:url('/images/crew/gunner_focus.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-armor @(IsMatrixActive("205") ? "active" : "")"
+                        aria-label="205"
+                        @onclick='() => ToggleMatrixButton(" 205")'
+                        style="background-image:url('/images/crew/gunner_quickAiming.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-armor @(IsMatrixActive("206") ? "active" : "")"
+                        aria-label="206"
+                        @onclick='() => ToggleMatrixButton(" 206")'
+                        style="background-image:url('/images/crew/gunner_armorer.png')">
+                </button>
+            </div>
+
+            <div class="matrix-row">
+                <div class="icon-cell i-optics" title="Optika" style="background-image:url('/images/crew/driver.png')"></div>
+
+                <button type="button"
+                        class="icon-btn i-state @(IsMatrixActive("301") ? "active" : "")"
+                        aria-label="301"
+                        @onclick='() => ToggleMatrixButton(" 301")'
+                        style="background-image:url('/images/crew/driver_virtuoso.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-year @(IsMatrixActive("302") ? "active" : "")"
+                        aria-label="302"
+                        @onclick='() => ToggleMatrixButton(" 302")'
+                        style="background-image:url('/images/crew/driver_smoothDriving.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-country @(IsMatrixActive("303") ? "active" : "")"
+                        aria-label="303"
+                        @onclick='() => ToggleMatrixButton(" 303")'
+                        style="background-image:url('/images/crew/driver_badRoadsKing.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-caliber @(IsMatrixActive("304") ? "active" : "")"
+                        aria-label="304"
+                        @onclick='() => ToggleMatrixButton(" 304")'
+                        style="background-image:url('/images/crew/driver_reliablePlacement.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-engine @(IsMatrixActive("305") ? "active" : "")"
+                        aria-label="305"
+                        @onclick='() => ToggleMatrixButton(" 305")'
+                        style="background-image:url('/images/crew/driver_rammingMaster.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-engine @(IsMatrixActive("306") ? "active" : "")"
+                        aria-label="306"
+                        @onclick='() => ToggleMatrixButton(" 306")'
+                        style="background-image:url('/images/crew/driver_motorExpert.png')">
+                </button>
+            </div>
+
+            <div class="matrix-row">
+                <div class="icon-cell i-speed" title="Sebesség" style="background-image:url('/images/crew/loader.png')"></div>
+
+                <button type="button"
+                        class="icon-btn i-weight @(IsMatrixActive("loader_desperado") ? "active" : "")"
+                        aria-label="Tömeg"
+                        @onclick='() => ToggleMatrixButton(" loader_desperado")'
+                        style="background-image:url('/images/crew/loader_desperado.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-mfg @(IsMatrixActive("402") ? "active" : "")"
+                        aria-label="402"
+                        @onclick='() => ToggleMatrixButton(" 402")'
+                        style="background-image:url('/images/crew/icon_perk_loader_pedant.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-fuel @(IsMatrixActive("403") ? "active" : "")"
+                        aria-label="403"
+                        @onclick='() => ToggleMatrixButton(" 403")'
+                        style="background-image:url('/images/crew/loader_intuition.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-gearbox @(IsMatrixActive("404") ? "active" : "")"
+                        aria-label="404"
+                        @onclick='() => ToggleMatrixButton(" 404")'
+                        style="background-image:url('/images/crew/loader_perfectCharge.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-susp @(IsMatrixActive("405") ? "active" : "")"
+                        aria-label="405"
+                        @onclick='() => ToggleMatrixButton(" 405")'
+                        style="background-image:url('/images/crew/loader_melee.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-engine @(IsMatrixActive("406") ? "active" : "")"
+                        aria-label="406"
+                        @onclick='() => ToggleMatrixButton(" 406")'
+                        style="background-image:url('/images/crew/loader_ammunitionImprove.png')">
+                </button>
+            </div>
+
+            <div class="matrix-row">
+                <div class="icon-cell i-stab" title="Stabilizátor" style="background-image:url('/images/crew/radioman.png')"></div>
+
+                <button type="button"
+                        class="icon-btn i-crew @(IsMatrixActive("501") ? "active" : "")"
+                        aria-label="501"
+                        @onclick='() => ToggleMatrixButton(" 501")'
+                        style="background-image:url('/images/crew/radioman_finder.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-armor @(IsMatrixActive("502") ? "active" : "")"
+                        aria-label="502"
+                        @onclick='() => ToggleMatrixButton(" 502")'
+                        style="background-image:url('/images/crew/commander_eagleEye.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-fcs @(IsMatrixActive("503") ? "active" : "")"
+                        aria-label="503"
+                        @onclick='() => ToggleMatrixButton(" 503")'
+                        style="background-image:url('/images/crew/radioman_interference.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-optics @(IsMatrixActive("504") ? "active" : "")"
+                        aria-label="504"
+                        @onclick='() => ToggleMatrixButton(" 504")'
+                        style="background-image:url('/images/crew/radioman_signalInterception.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-state @(IsMatrixActive("505") ? "active" : "")"
+                        aria-label="505"
+                        @onclick='() => ToggleMatrixButton(" 505")'
+                        style="background-image:url('/images/crew/commander_eagleEye.png')">
+                </button>
+
+                <button type="button"
+                        class="icon-btn i-state @(IsMatrixActive("506") ? "active" : "")"
+                        aria-label="506"
+                        @onclick='() => ToggleMatrixButton(" 506")'
+                        style="background-image:url('/images/crew/fireFighting.png')">
+                </button>
+            </div>
+        </div>
+    </section>
+</section>
+
+<!-- ======= Táblázatok ======= -->
+<main>
+    <div class="tables-grid">
+        <section class="card">
+            <h3>Gun</h3>
+            <div class="inner">
+                <table>
+                    <thead>
+                    </thead>
+                    <tbody>
+                        <tr><td>Caliber</td><td>@WithUnit(tank?.GunCaliber, " mm")</td></tr>
+                        <tr><td>Rate of fire</td><td>@DisplayFireRate(tank)</td></tr>
+                        <tr><td>DPM</td><td>@DisplayDpm(tank)</td></tr>
+                        <tr><td>AVG Damage</td><td>@DisplayAmmoDamage(tank)</td></tr>
+                        <tr><td>Penetration</td><td>@DisplayAmmoPenetration(tank)</td></tr>
+                        <tr><td>Reload time</td><td>@DisplayGunReloadTime(tank)</td></tr>
+                        <tr><td>Aim time</td><td>@DisplayGunAimingTime(tank)</td></tr>
+                        <tr><td>Dispersion</td><td>@DisplayGunDispersionRadius(tank)</td></tr>
+                        <tr><td>Damaged Dispersion</td><td>@DisplayGunDispersionWhileDamaged(tank)</td></tr>
+                        <tr><td>Moving Dispersion</td><td>@DisplayFirstChassisDispersion(tank)</td></tr>
+                        <tr><td>Turret Traverse Dispersion</td><td>@DisplayGunDispersionTurretRotation(tank)</td></tr>
+                        <tr><td>After Shot</td><td>@DisplayGunDispersionAfterShot(tank)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card">
+            <h3>Mobility</h3>
+            <div class="inner">
+                <table>
+                    <thead>
+                    </thead>
+                    <tbody>
+                        <tr><td>Top speed</td><td>@DisplaySpeed(tank, true)</td></tr>
+                        <tr><td>Engine Power</td><td>@WithUnit(tank?.EnginePower, " hp")</td></tr>
+                        <tr><td>Reverse speed</td><td>@DisplaySpeed(tank, false)</td></tr>
+                        <tr><td>Rotation Speed</td><td>@DisplayRotationSpeed(tank)</td></tr>
+                        <tr><td>Terrain Resistance</td><td>@DisplayFirstChassisValue(tank, c => c.TerrainResistance)</td></tr>
+                        <tr><td>Gun min pitch</td><td>@DisplayGunMinPitch(tank)</td></tr>
+                        <tr><td>Gun max pitch</td><td>@DisplayGunMaxPitch(tank)</td></tr>
+                        <tr><td>Gun traverse range</td><td>@DisplayFirstGunValue(tank, g => g.TurretYawLimits)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card">
+            <h3>Survivability</h3>
+            <div class="inner">
+                <table>
+                    <thead>
+                    </thead>
+                    <tbody>
+                        <tr><td>HP</td><td>@Fmt(tank?.HP)</td></tr>
+                        <tr><td>Hull health</td><td>@Fmt(tank?.HullHP)</td></tr>
+                        <tr><td>Weight</td><td>@DisplayTotalWeight(tank)</td></tr>
+                        <tr><td>Max Load</td><td>@DisplayFirstChassisValue(tank, c => c.MaxLoad, " kg")</td></tr>
+                        <tr><td>Ammo rack health</td><td>@Fmt(tank?.Hull?.AmmoBayHealth?.MaxHealth)</td></tr>
+                        <tr><td>Turret Rotator Health</td><td>@DisplayTurretRotatorMaxHealth(tank)</td></tr>
+                        <tr><td>Hull armor</td><td>@DisplayHullArmor(tank, "armor_1")</td></tr>
+                        <tr><td>Turret armor</td><td>@DisplayTurretArmor(tank, "armor_1")</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card">
+            <h3>Visibility / Crew</h3>
+            <div class="inner">
+                <table>
+                    <thead>
+                    </thead>
+                    <tbody>
+                        <tr><td>View Range</td><td>@DisplayTurretVision(tank)</td></tr>
+                        <tr><td>Still invisibility</td><td>@DisplayInvisibilityStill(tank)/@DisplayGunInvisibilityAtShotStill(tank)</td></tr>
+                        <tr><td>Moving invisibility</td><td>@DisplayInvisibilityMoving(tank)/@DisplayGunInvisibilityAtShotMoving(tank)</td></tr>
+                        <tr><td>Commander</td><td>@Fmt(tank?.Crew?.Commander)</td></tr>
+                        <tr><td>Gunner</td><td>@Fmt(tank?.Crew?.Gunner)</td></tr>
+                        <tr><td>Driver</td><td>@Fmt(tank?.Crew?.Driver)</td></tr>
+                        <tr><td>Radioman</td><td>@Fmt(tank?.Crew?.Radioman)</td></tr>
+                        <tr><td>Loader</td><td>@Fmt(tank?.Crew?.Loader)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- ======= Lábléc ======= -->
+<footer>
+    <div class="footer-inner">
+        <div>© <span id="y">@DateTime.Now.Year</span> WotBriefingRoom</div>
+        <div>Made with ♥ for a Three.js canvas demóhoz</div>
+    </div>
+</footer>
+@RenderList(consumables,
+emptyText: "Nincs adat.",
+        item: c => @<li><b>@c.Description</b> – Ár: @c.Price @((!string.IsNullOrWhiteSpace(c.Improved)) ? $"(Improved: {c.Improved})" : "")</li>)
+
+        <h4>Equipments</h4>
+        @RenderList(equipments,
+        emptyText: "Nincs adat.",
+        item: e => @<li><b>@e._Id</b> – Ár: @e.Price – Forrás: @e.Source</li>)
+
+        <h4>Field Modifications</h4>
+        @RenderList(fieldMods,
+        emptyText: "Nincs adat.",
+        item: fm => @<li><b>@fm.LocName</b> – Tree: @fm.TreeName – Unlock lvl: @fm.UnlockLevel – Min vehicle lvl: @fm.MinVehicleLevel</li>)
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    private FrontEndData? tank;
+    private List<Consumables>? consumables;
+    private List<Equipments>? equipments;
+    private List<CrewSkills>? crewSkills;
+    private List<FiledModefication>? fieldMods;
+
+    private double modulStatConverter = 0.959;
+
+    private string selectedGunKey = "Összes";
+    private string selectedTurretKey = "Összes";
+    private string selectedEngineKey = "Összes";
+    private string selectedChassisKey = "Összes";
+    private string selectedAmmoType = string.Empty;
+    private Dictionary<string, string> activeGroupButtons = new();
+    private HashSet<string> activeMatrixButtons = new();
+    private bool isAmmoOpen;
+
+    private ITankMechanic? mechanic;
+
+    private TankMechanicContext MechanicContext => new()
+    {
+        Tank = tank,
+        SelectedGunKey = selectedGunKey,
+        SelectedTurretKey = selectedTurretKey,
+        SelectedEngineKey = selectedEngineKey,
+        SelectedChassisKey = selectedChassisKey,
+        SelectedAmmoType = selectedAmmoType,
+        ActiveMatrixButtons = activeMatrixButtons
+    };
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        tank = await Http.GetFromJsonAsync<FrontEndData>($"api/tanks/{id}");
+        consumables = await Http.GetFromJsonAsync<List<Consumables>>("api/bonuses/consumables");
+        equipments = await Http.GetFromJsonAsync<List<Equipments>>("api/bonuses/equipments");
+        crewSkills = await Http.GetFromJsonAsync<List<CrewSkills>>("api/bonuses/crewskills");
+        fieldMods = await Http.GetFromJsonAsync<List<FiledModefication>>("api/bonuses/fieldmods");
+
+        CrewSkillService.SetCrewSkills(crewSkills);
+
+        if (tank?.Guns != null && tank.Guns.Count > 0)
+            selectedGunKey = tank.Guns.Keys.First();
+
+        if (tank?.Turrets0 != null && tank.Turrets0.Count > 0)
+            selectedTurretKey = tank.Turrets0.Keys.First();
+
+        if (tank?.Engines != null && tank.Engines.Count > 0)
+            selectedEngineKey = tank.Engines.Keys.First();
+
+        if (tank?.Chassis != null && tank.Chassis.Count > 0)
+            selectedChassisKey = tank.Chassis.Keys.First();
+
+        if (tank?.Ammo != null && tank.Ammo.Count > 0)
+            selectedAmmoType = tank.Ammo[0].Type ?? string.Empty;
+
+        mechanic = CreateMechanic(tank);
+    }
+
+    private RenderFragment RenderList<T>(
+        List<T>? list,
+        string emptyText,
+        Func<T, RenderFragment> item) => __builder =>
+    {
+        if (list is null)
+        {
+            __builder.AddContent(0, (RenderFragment)(b => b.AddContent(1, "Betöltés...")));
+            return;
+        }
+
+        if (list.Count == 0)
+        {
+            __builder.AddContent(0, (RenderFragment)(b => b.AddContent(1, emptyText)));
+            return;
+        }
+
+        __builder.OpenElement(0, "ul");
+        int seq = 1;
+        foreach (var it in list)
+        {
+            __builder.OpenElement(seq++, "li");
+            __builder.AddContent(seq++, item(it));
+            __builder.CloseElement();
+        }
+        __builder.CloseElement();
+    };
+
+    private static double? ParseDouble(object? value)
+    {
+        if (value == null)
+            return null;
+
+        if (value is string s)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+                return null;
+
+            if (double.TryParse(
+                s,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out var result))
+            {
+                return result;
+            }
+
+            return null;
+        }
+
+        try
+        {
+            return Convert.ToDouble(value, CultureInfo.InvariantCulture);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static string MultiplyAndFormat(
+        object? value,
+        double multiplier,
+        string unit = "",
+        string format = "0.00")
+    {
+        var parsed = ParseDouble(value);
+
+        if (parsed == null)
+            return "-";
+
+        var result = parsed.Value * multiplier;
+
+        return result.ToString(format, CultureInfo.InvariantCulture) + unit;
+    }
+
+    private static string Fmt(object? value)
+    {
+        if (value is null) return "-";
+
+        if (value is string s)
+            return string.IsNullOrWhiteSpace(s) ? "-" : s;
+
+        return value.ToString() ?? "-";
+    }
+
+    private static string WithUnit(object? value, string unit)
+    {
+        var formatted = Fmt(value);
+        return formatted == "-" ? "-" : formatted + unit;
+    }
+
+    private static string DisplayTierType(FrontEndData? tank)
+    {
+        if (tank is null) return "-";
+
+        var level = Fmt(tank.Level);
+        var type = Fmt(tank.Type);
+
+        return level == "-" && type == "-" ? "-" : level + " / " + type;
+    }
+
+    private static string DisplayFirstKey(Dictionary<string, object>? data)
+    {
+        return data != null && data.Count > 0
+            ? data.Keys.FirstOrDefault() ?? "-"
+            : "-";
+    }
+
+    private static AmmoData? GetPrimaryAmmo(FrontEndData? tank)
+    {
+        return tank?.Ammo?.FirstOrDefault();
+    }
+
+    private  string DisplayAmmoDamage(FrontEndData? tank)
+    {
+        var ammo = GetSelectedAmmo(tank);
+        if (ammo == null || ammo.Damage == null || ammo.Damage.Count < 2)
+            return "-";
+
+        return ammo.Damage[1].ToString();
+    }
+
+    private string DisplayAmmoPenetration(FrontEndData? tank)
+    {
+        var ammo = GetSelectedAmmo(tank);
+        if (ammo == null || ammo.Penetration == null || ammo.Penetration.Count < 2)
+            return "-";
+
+        return ammo.Penetration[1].ToString();
+    }
+
+    private void ToggleAmmoSelect()
+    {
+        isAmmoOpen = !isAmmoOpen;
+    }
+
+    private void SelectAmmo(AmmoData ammo)
+    {
+        selectedAmmoType = ammo.Type ?? string.Empty;
+        isAmmoOpen = false;
+    }
+
+    private string GetSelectedAmmoTitle()
+    {
+        var ammo = GetSelectedAmmo(tank);
+        return GetAmmoTitle(ammo?.Type);
+    }
+
+    private string GetSelectedAmmoImage()
+    {
+        return GetAmmoImage(selectedAmmoType);
+    }
+
+    private string GetAmmoImage(string? ammoType)
+    {
+        if (string.IsNullOrWhiteSpace(ammoType))
+            return "/images/ammo/ARMOR_PIERCING.png";
+
+        return "/images/ammo/" + ammoType + ".png";
+    }
+
+    private static string GetAmmoTitle(string? ammoType)
+    {
+        return ammoType switch
+        {
+            "ARMOR_PIERCING" => "Armor Piercing (AP)",
+            "ARMOR_PIERCING_CR" => "Armor Piercing Composite Rigid (APCR)",
+            "HIGH_EXPLOSIVE" => "High Explosive (HE)",
+            "HOLLOW_CHARGE" => "High Explosive Anti-Tank (HEAT)",
+            _ => ammoType ?? "-"
+        };
+    }
+
+    private static string GetAmmoPenetration(AmmoData? ammo)
+    {
+        if (ammo?.Penetration == null || ammo.Penetration.Count < 2)
+            return "-";
+
+        return ammo.Penetration[1].ToString();
+    }
+
+    private static string GetAmmoDamage(AmmoData? ammo)
+    {
+        if (ammo?.Damage == null || ammo.Damage.Count < 2)
+            return "-";
+
+        return ammo.Damage[1].ToString();
+    }
+
+    private AmmoData? GetSelectedAmmo(FrontEndData? tank)
+    {
+        return mechanic?.GetSelectedAmmo(MechanicContext);
+    }
+
+    private string DisplayDpm(FrontEndData? tank)
+    {
+        return mechanic?.DisplayDpm(MechanicContext) ?? "-";
+    }
+
+    private string DisplayFireRate(FrontEndData? tank)
+    {
+        return mechanic?.DisplayFireRate(MechanicContext) ?? "-";
+    }
+
+    private GunModuleData? GetSelectedGun(FrontEndData? tank)
+    {
+        return mechanic?.GetSelectedGun(MechanicContext);
+    }
+
+
+
+    private  string DisplayFirstGunValue(FrontEndData? tank, Func<GunModuleData, object?> selector, string unit = "")
+    {
+        var gun = GetSelectedGun(tank);
+        if (gun == null)
+            return "-";
+
+        var formatted = Fmt(selector(gun));
+        return formatted == "-" ? "-" : formatted + unit;
+    }
+
+    private string DisplayGunAimingTime(FrontEndData? tank)
+    {
+        return mechanic?.DisplayGunAimingTime(MechanicContext) ?? "-";
+    }
+
+    private string DisplayGunDispersionAfterShot(FrontEndData? tank)
+    {
+        return DisplaySelectedGunValue(tank, g => g.ShotDispersionFactors?.AfterShot);
+    }
+
+    private string DisplayGunDispersionTurretRotation(FrontEndData? tank)
+    {
+        return DisplaySelectedGunValue(tank, g => g.ShotDispersionFactors?.TurretRotation);
+    }
+
+    private string DisplayGunDispersionWhileDamaged(FrontEndData? tank)
+    {
+        return DisplaySelectedGunValue(tank, g => g.ShotDispersionFactors?.WhileGunDamaged);
+    }
+
+    private string DisplayGunMinPitch(FrontEndData? tank)
+    {
+        return DisplaySelectedGunValue(tank, g => g.PitchLimits?.MinPitch);
+    }
+
+    private string DisplayGunMaxPitch(FrontEndData? tank)
+    {
+        return DisplaySelectedGunValue(tank, g => g.PitchLimits?.MaxPitch);
+    }
+
+    private string DisplayGunYawLimits(FrontEndData? tank)
+    {
+        return DisplaySelectedGunValue(tank, g => g.TurretYawLimits);
+    }
+
+    private string DisplayGunReloadTime(FrontEndData? tank)
+    {
+        return mechanic?.DisplayGunReloadTime(MechanicContext) ?? "-";
+    }
+
+    private string DisplayGunDispersionRadius(FrontEndData? tank)
+    {
+        return mechanic?.DisplayGunDispersionRadius(MechanicContext) ?? "-";
+    }
+
+    private string DisplaySelectedGunValue(FrontEndData? tank, Func<GunModuleData, object?> selector, string unit = "")
+    {
+        var gun = GetSelectedGun(tank);
+        if (gun == null)
+            return "-";
+
+        var formatted = Fmt(selector(gun));
+        return formatted == "-" ? "-" : formatted + unit;
+    }
+
+    private ChassisData? GetSelectedChassis(FrontEndData? tank)
+    {
+        return mechanic?.GetSelectedChassis(MechanicContext);
+    }
+
+    private static ChassisData? GetFirstChassis(FrontEndData? tank)
+    {
+        return tank?.Chassis?.Values.FirstOrDefault();
+    }
+
+    private static string DisplayFirstChassisValue(FrontEndData? tank, Func<ChassisData, object?> selector, string unit = "")
+    {
+        var chassis = GetFirstChassis(tank);
+        if (chassis == null)
+            return "-";
+
+        var formatted = Fmt(selector(chassis));
+        return formatted == "-" ? "-" : formatted + unit;
+    }
+
+    private static string DisplayFirstChassisDispersion(FrontEndData? tank)
+    {
+        var chassis = GetFirstChassis(tank);
+        if (chassis == null || chassis.ShotDispersionFactors == null)
+            return "-";
+
+        var move = Fmt(chassis.ShotDispersionFactors.VehicleMovement);
+        var rot = Fmt(chassis.ShotDispersionFactors.VehicleRotation);
+
+        return move == "-" && rot == "-" ? "-" : move + " / " + rot;
+    }
+
+    private static string DisplaySpeed(FrontEndData? tank, bool forward)
+    {
+        var value = forward ? tank?.SpeedLimits?.Forward : tank?.SpeedLimits?.Backward;
+        var formatted = Fmt(value);
+        return formatted == "-" ? "-" : formatted + " km/h";
+    }
+
+    private static string DisplayArmorValue(object? value)
+    {
+        if (value == null)
+            return "-";
+
+        if (value is string s)
+            return string.IsNullOrWhiteSpace(s) ? "-" : s;
+
+        if (value is IDictionary<string, object> dict && dict.Count > 0)
+            return string.Join(", ", dict.Select(x => x.Key + ": " + Fmt(x.Value)));
+
+        return value.ToString() ?? "-";
+    }
+
+    private static string DisplayHullArmor(FrontEndData? tank, string key)
+    {
+        if (tank?.Hull?.Armor != null && tank.Hull.Armor.TryGetValue(key, out var value))
+            return DisplayArmorValue(value);
+
+        return "-";
+    }
+
+    private TurretDataFrontEnd? GetSelectedTurret(FrontEndData? tank)
+    {
+        return mechanic?.GetSelectedTurret(MechanicContext);
+    }
+    private static TurretDataFrontEnd? GetFirstTurret(FrontEndData? tank)
+    {
+        return tank?.Turrets0?.Values.FirstOrDefault();
+    }
+
+    private string DisplayTurretVision(FrontEndData? tank)
+    {
+        return mechanic?.DisplayTurretVision(MechanicContext) ?? "-";
+    }
+
+    private static string DisplayTurretRotatorMaxHealth(FrontEndData? tank)
+    {
+        var turret = GetFirstTurret(tank);
+        return Fmt(turret?.TurretRotatorHealth?.MaxHealth);
+    }
+
+    private static string DisplayTurretRotatorMaxRegenHealth(FrontEndData? tank)
+    {
+        var turret = GetFirstTurret(tank);
+        return Fmt(turret?.TurretRotatorHealth?.MaxRegenHealth);
+    }
+
+    private static string DisplayTurretRotatorRepairCost(FrontEndData? tank)
+    {
+        var turret = GetFirstTurret(tank);
+        return Fmt(turret?.TurretRotatorHealth?.RepairCost);
+    }
+
+    private static string DisplaySurveyingDeviceMaxHealth(FrontEndData? tank)
+    {
+        var turret = GetFirstTurret(tank);
+        return Fmt(turret?.SurveyingDeviceHealth?.MaxHealth);
+    }
+
+    private static string DisplaySurveyingDeviceMaxRegenHealth(FrontEndData? tank)
+    {
+        var turret = GetFirstTurret(tank);
+        return Fmt(turret?.SurveyingDeviceHealth?.MaxRegenHealth);
+    }
+
+    private static string DisplaySurveyingDeviceRepairCost(FrontEndData? tank)
+    {
+        var turret = GetFirstTurret(tank);
+        return Fmt(turret?.SurveyingDeviceHealth?.RepairCost);
+    }
+
+    private string DisplayTurretArmor(FrontEndData? tank, string key)
+    {
+        var turret = GetSelectedTurret(tank);
+
+        if (turret?.Armor != null && turret.Armor.TryGetValue(key, out var value))
+            return DisplayArmorValue(value);
+
+        return "-";
+    }
+
+    private static string DisplayTotalWeight(FrontEndData? tank)
+    {
+        if (tank == null)
+            return "-";
+
+        var total =
+            (ParseDouble(tank.Hull?.Weight) ?? 0) +
+            tank.GunWeight +
+            tank.EngineWeight +
+            (ParseDouble(tank.Chassis?.Values.FirstOrDefault()?.Weight) ?? 0);
+
+        return total.ToString("0.00", CultureInfo.InvariantCulture) + " kg";
+    }
+
+    private string DisplayRotationSpeed(FrontEndData? tank)
+    {
+        return mechanic?.DisplayRotationSpeed(MechanicContext) ?? "-";
+    }
+
+    private static string DisplayInvisibilityMoving(FrontEndData? tank)
+    {
+        return MultiplyAndFormat(tank?.Invisibility?.Moving, 57);
+    }
+
+    private static string DisplayInvisibilityStill(FrontEndData? tank)
+    {
+        return MultiplyAndFormat(tank?.Invisibility?.Still, 57);
+    }
+
+    private  string DisplayGunInvisibilityAtShotMoving(FrontEndData? tank)
+    {
+        var gun = GetSelectedGun(tank);
+
+        var shot = ParseDouble(gun?.InvisibilityFactorAtShot);
+        var moving = ParseDouble(tank?.Invisibility?.Moving);
+
+        if (shot == null || moving == null)
+            return "-";
+
+        var result = shot.Value * (moving.Value * 57);
+        return result.ToString("0.###", CultureInfo.InvariantCulture);
+    }
+
+    private string DisplayGunInvisibilityAtShotStill(FrontEndData? tank)
+    {
+        var gun = GetSelectedGun(tank);
+
+        var shot = ParseDouble(gun?.InvisibilityFactorAtShot);
+        var still = ParseDouble(tank?.Invisibility?.Still);
+
+        if (shot == null || still == null)
+            return "-";
+
+        var result = shot.Value * (still.Value * 57);
+        return result.ToString("0.###", CultureInfo.InvariantCulture);
+    }
+
+    private static string DisplayCrewRole(FrontEndData? tank, Func<CrewData, string> selector)
+    {
+        if (tank?.Crew == null)
+            return "-";
+
+        var value = selector(tank.Crew);
+        return string.IsNullOrWhiteSpace(value) ? "-" : value;
+    }
+
+
+    //crew
+    // crew / skill selection
+
+    private static string NormalizeButtonId(string? id)
+    {
+        return string.IsNullOrWhiteSpace(id) ? string.Empty : id.Trim();
+    }
+
+    private CrewSkills? GetCrewSkillByLabel(string? ariaLabel)
+    {
+        var normalized = NormalizeButtonId(ariaLabel);
+
+        if (string.IsNullOrWhiteSpace(normalized) || crewSkills == null)
+            return null;
+
+        if (!int.TryParse(normalized, out var id))
+            return null;
+
+        return crewSkills.FirstOrDefault(x => x.Id == id);
+    }
+
+    /*private string GetCrewSkillText(string? ariaLabel, string fallback)
+    {
+        var skill = GetCrewSkillByLabel(ariaLabel);
+
+        if (skill == null || skill.Args == null || skill.Args.Count == 0)
+            return fallback;
+
+        var parts = skill.Args
+            .Where(a => a != null && !string.IsNullOrWhiteSpace(a.Name))
+            .Select(a => $"{a.Name}: {a.ValueRaw}");
+
+        var text = string.Join(" | ", parts);
+
+        return string.IsNullOrWhiteSpace(text) ? fallback : text;
+    }*/
+
+    private string GetCrewSkillTitle(string? ariaLabel, string fallbackTitle)
+    {
+        var normalized = NormalizeButtonId(ariaLabel);
+        var skill = GetCrewSkillByLabel(normalized);
+
+        if (skill == null)
+            return fallbackTitle;
+
+        return $"Skill {normalized}";
+    }
+
+    private void SelectGroupButton(string groupName, string id)
+    {
+        var normalizedGroup = NormalizeButtonId(groupName);
+        var normalizedId = NormalizeButtonId(id);
+
+        if (string.IsNullOrWhiteSpace(normalizedGroup) || string.IsNullOrWhiteSpace(normalizedId))
+            return;
+
+        if (activeGroupButtons.TryGetValue(normalizedGroup, out var current) && current == normalizedId)
+        {
+            activeGroupButtons.Remove(normalizedGroup);
+        }
+        else
+        {
+            activeGroupButtons[normalizedGroup] = normalizedId;
+        }
+    }
+
+    private bool IsGroupActive(string groupName, string id)
+    {
+        var normalizedGroup = NormalizeButtonId(groupName);
+        var normalizedId = NormalizeButtonId(id);
+
+        return activeGroupButtons.TryGetValue(normalizedGroup, out var current)
+            && current == normalizedId;
+    }
+
+    private void ToggleMatrixButton(string id)
+    {
+        var normalizedId = NormalizeButtonId(id);
+
+        if (string.IsNullOrWhiteSpace(normalizedId))
+            return;
+
+        if (!activeMatrixButtons.Add(normalizedId))
+            activeMatrixButtons.Remove(normalizedId);
+    }
+
+    private bool IsMatrixActive(string id)
+    {
+        var normalizedId = NormalizeButtonId(id);
+
+        return !string.IsNullOrWhiteSpace(normalizedId)
+            && activeMatrixButtons.Contains(normalizedId);
+    }
+
+    private IEnumerable<CrewSkills> GetActiveMatrixSkills()
+    {
+        if (crewSkills == null || activeMatrixButtons.Count == 0)
+            return Enumerable.Empty<CrewSkills>();
+
+        return crewSkills.Where(s => activeMatrixButtons.Contains(s.Id.ToString()));
+    }
+
+    private string GetActiveMatrixSkillIds()
+    {
+        return activeMatrixButtons.Count == 0
+            ? "-"
+            : string.Join(", ", activeMatrixButtons.OrderBy(x => x));
+    }
+
+    private ITankMechanic CreateMechanic(FrontEndData? currentTank)
+    {
+        if (currentTank == null)
+            return new StandardTankMechanic(CrewSkillService);
+
+        var level = Convert.ToInt32(currentTank.Level, CultureInfo.InvariantCulture);
+
+        if (level != 11)
+            return new StandardTankMechanic(CrewSkillService);
+
+        // Ide jönnek majd a konkrét Tier 11 tankok.
+        // Példa:
+        // return currentTank.Name switch
+        // {
+        //     "Blatte" => new BlatteMechanic(CrewSkillService),
+        //     "Hirsch" => new HirschMechanic(CrewSkillService),
+        //     _ => new UnknownTier11Mechanic(CrewSkillService)
+        // };
+
+        return new UnknownTier11Mechanic(CrewSkillService);
+    }
+
+    private sealed class TankMechanicContext
+    {
+        public FrontEndData? Tank { get; set; }
+        public string SelectedGunKey { get; set; } = string.Empty;
+        public string SelectedTurretKey { get; set; } = string.Empty;
+        public string SelectedEngineKey { get; set; } = string.Empty;
+        public string SelectedChassisKey { get; set; } = string.Empty;
+        public string SelectedAmmoType { get; set; } = string.Empty;
+        public HashSet<string> ActiveMatrixButtons { get; set; } = new();
+    }
+
+    private interface ITankMechanic
+    {
+        string TankKey { get; }
+        bool IsTier11 { get; }
+
+        AmmoData? GetSelectedAmmo(TankMechanicContext context);
+        GunModuleData? GetSelectedGun(TankMechanicContext context);
+        ChassisData? GetSelectedChassis(TankMechanicContext context);
+        TurretDataFrontEnd? GetSelectedTurret(TankMechanicContext context);
+
+        string DisplayDpm(TankMechanicContext context);
+        string DisplayFireRate(TankMechanicContext context);
+        string DisplayGunAimingTime(TankMechanicContext context);
+        string DisplayGunReloadTime(TankMechanicContext context);
+        string DisplayGunDispersionRadius(TankMechanicContext context);
+        string DisplayTurretVision(TankMechanicContext context);
+        string DisplayRotationSpeed(TankMechanicContext context);
+    }
+
+    private abstract class TankMechanicBase : ITankMechanic
+    {
+        protected readonly CrewSkillService CrewSkillService;
+        protected const double ModulStatConverter = 0.959;
+
+        protected TankMechanicBase(CrewSkillService crewSkillService)
+        {
+            CrewSkillService = crewSkillService;
+        }
+
+        public abstract string TankKey { get; }
+        public virtual bool IsTier11 => false;
+
+        public virtual AmmoData? GetSelectedAmmo(TankMechanicContext context)
+        {
+            var tank = context.Tank;
+
+            if (tank?.Ammo == null || tank.Ammo.Count == 0)
+                return null;
+
+            var selected = tank.Ammo.FirstOrDefault(a => a.Type == context.SelectedAmmoType);
+            return selected ?? tank.Ammo.FirstOrDefault();
+        }
+
+        public virtual GunModuleData? GetSelectedGun(TankMechanicContext context)
+        {
+            var tank = context.Tank;
+
+            if (tank?.Guns == null || tank.Guns.Count == 0)
+                return null;
+
+            if (!string.IsNullOrWhiteSpace(context.SelectedGunKey) &&
+                tank.Guns.TryGetValue(context.SelectedGunKey, out var selectedGun))
+            {
+                return selectedGun;
+            }
+
+            return tank.Guns.Values.FirstOrDefault();
+        }
+
+        public virtual ChassisData? GetSelectedChassis(TankMechanicContext context)
+        {
+            var tank = context.Tank;
+
+            if (tank?.Chassis == null || tank.Chassis.Count == 0)
+                return null;
+
+            if (!string.IsNullOrWhiteSpace(context.SelectedChassisKey) &&
+                tank.Chassis.TryGetValue(context.SelectedChassisKey, out var selectedChassis))
+            {
+                return selectedChassis;
+            }
+
+            return tank.Chassis.Values.FirstOrDefault();
+        }
+
+        public virtual TurretDataFrontEnd? GetSelectedTurret(TankMechanicContext context)
+        {
+            var tank = context.Tank;
+
+            if (tank?.Turrets0 == null || tank.Turrets0.Count == 0)
+                return null;
+
+            if (!string.IsNullOrWhiteSpace(context.SelectedTurretKey) &&
+                tank.Turrets0.TryGetValue(context.SelectedTurretKey, out var selectedTurret))
+            {
+                return selectedTurret;
+            }
+
+            return tank.Turrets0.Values.FirstOrDefault();
+        }
+
+        public virtual string DisplayDpm(TankMechanicContext context)
+        {
+            var gun = GetSelectedGun(context);
+            var ammo = GetSelectedAmmo(context);
+
+            if (ammo?.Damage == null || ammo.Damage.Count < 2)
+                return "-";
+
+            var reloadTime = ParseDouble(gun?.ReloadTime);
+            var modifiedReload = CrewSkillService.ApplyReloadTime(reloadTime, context.ActiveMatrixButtons);
+
+            if (modifiedReload == null || modifiedReload <= 0)
+                return "-";
+
+            var fireRate = 60d / modifiedReload.Value / ModulStatConverter;
+            var dpm = ammo.Damage[1] * fireRate;
+
+            return dpm.ToString("0", CultureInfo.InvariantCulture);
+        }
+
+        public virtual string DisplayFireRate(TankMechanicContext context)
+        {
+            var gun = GetSelectedGun(context);
+            var reloadTime = ParseDouble(gun?.ReloadTime);
+
+            var modifiedReload = CrewSkillService.ApplyReloadTime(reloadTime, context.ActiveMatrixButtons);
+
+            if (modifiedReload == null || modifiedReload <= 0)
+                return "-";
+
+            var shotsPerMinute = 60d / modifiedReload.Value / ModulStatConverter;
+
+            return shotsPerMinute.ToString("0.00", CultureInfo.InvariantCulture);
+        }
+
+        public virtual string DisplayGunAimingTime(TankMechanicContext context)
+        {
+            var gun = GetSelectedGun(context);
+            var rawValue = ParseDouble(gun?.AimingTime);
+
+            if (rawValue == null)
+                return "-";
+
+            var baseValue = rawValue.Value * ModulStatConverter;
+            var modified = CrewSkillService.ApplyAimingTime(baseValue, context.ActiveMatrixButtons);
+
+            return CrewSkillService.FormatValue(modified, "0.00", " s");
+        }
+
+        public virtual string DisplayGunReloadTime(TankMechanicContext context)
+        {
+            var gun = GetSelectedGun(context);
+            var rawValue = ParseDouble(gun?.ReloadTime);
+
+            if (rawValue == null)
+                return "-";
+
+            var baseValue = rawValue.Value * ModulStatConverter;
+            var modified = CrewSkillService.ApplyReloadTime(baseValue, context.ActiveMatrixButtons);
+
+            return CrewSkillService.FormatValue(modified, "0.00", " s");
+        }
+
+        public virtual string DisplayGunDispersionRadius(TankMechanicContext context)
+        {
+            var gun = GetSelectedGun(context);
+            var rawValue = ParseDouble(gun?.ShotDispersionRadius);
+
+            if (rawValue == null)
+                return "-";
+
+            var baseValue = rawValue.Value * ModulStatConverter;
+            var modified = CrewSkillService.ApplyDispersion(baseValue, context.ActiveMatrixButtons);
+
+            return CrewSkillService.FormatValue(modified, "0.00");
+        }
+
+        public virtual string DisplayTurretVision(TankMechanicContext context)
+        {
+            var turret = GetSelectedTurret(context);
+            var baseValue = ParseDouble(turret?.CircularVisionRadius);
+            var modified = CrewSkillService.ApplyViewRange(baseValue, context.ActiveMatrixButtons);
+
+            return CrewSkillService.FormatValue(modified, "0.00", " m");
+        }
+
+        public virtual string DisplayRotationSpeed(TankMechanicContext context)
+        {
+            var chassis = GetSelectedChassis(context);
+            var rawValue = ParseDouble(chassis?.RotationSpeed);
+
+            if (rawValue == null)
+                return "-";
+
+            var baseValue = rawValue.Value / ModulStatConverter;
+            var modified = CrewSkillService.ApplyRotationSpeed(baseValue, context.ActiveMatrixButtons);
+
+            return CrewSkillService.FormatValue(modified, "0.00", " deg/s");
+        }
+
+        protected static double? ParseDouble(object? value)
+        {
+            if (value == null)
+                return null;
+
+            if (value is string s)
+            {
+                if (string.IsNullOrWhiteSpace(s))
+                    return null;
+
+                if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+                    return result;
+
+                return null;
+            }
+
+            try
+            {
+                return Convert.ToDouble(value, CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+    }
+
+    private sealed class StandardTankMechanic : TankMechanicBase
+    {
+        public StandardTankMechanic(CrewSkillService crewSkillService)
+            : base(crewSkillService)
+        {
+        }
+
+        public override string TankKey => "STANDARD";
+    }
+
+    private abstract class Tier11MechanicBase : TankMechanicBase
+    {
+        protected Tier11MechanicBase(CrewSkillService crewSkillService)
+            : base(crewSkillService)
+        {
+        }
+
+        public override bool IsTier11 => true;
+
+        public abstract string DisplayUniqueMechanic(TankMechanicContext context);
+    }
+
+    private sealed class UnknownTier11Mechanic : Tier11MechanicBase
+    {
+        public UnknownTier11Mechanic(CrewSkillService crewSkillService)
+            : base(crewSkillService)
+        {
+        }
+
+        public override string TankKey => "UNKNOWN_TIER_11";
+
+        public override string DisplayUniqueMechanic(TankMechanicContext context)
+        {
+            return "Ehhez a Tier 11 tankhoz még nincs külön mechanika megadva.";
+        }
+    }
+
+}

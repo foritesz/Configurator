@@ -1,0 +1,17 @@
+
+
+* {
+    box-sizing: border-box
+}
+
+html, body, page {
+    height: 100%
+}
+
+.page {
+    margin: 0;
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #0b0f14 30%, #10151d 100%);
+}
+

@@ -1,0 +1,47 @@
+﻿<header>
+    <nav class="nav" aria-label="Fő navigáció">
+        <div class="brand" aria-label="Márka">
+            <span class="dot" aria-hidden="true"></span>
+            <span>
+                <NavLink href="" Match="NavLinkMatch.All">WotBriefingRoom</NavLink>
+            </span>
+        </div>
+
+        <div class="menu" role="menubar" aria-label="Fő menü">
+            <NavLink role="menuitem" href="counter">Compare</NavLink>
+            <NavLink role="menuitem" href="tanks">Tanks</NavLink>
+            <NavLink role="menuitem" href="">About</NavLink>
+        </div>
+
+        <button class="hamburger"
+                aria-label="Menü megnyitása"
+                aria-expanded="@(!collapseNavMenu).ToString().ToLower()"
+                aria-controls="mobileMenu"
+                @onclick="ToggleNavMenu">
+            <span></span>
+        </button>
+    </nav>
+
+    <div id="mobileMenu"
+         class="menu-mobile @(collapseNavMenu ? string.Empty : "open")"
+         role="menu"
+         aria-hidden="@collapseNavMenu.ToString().ToLower()">
+        <NavLink role="menuitem" href="counter" @onclick="CloseNavMenu">Compare</NavLink>
+        <NavLink role="menuitem" href="tanks" @onclick="CloseNavMenu">Tanks</NavLink>
+        <NavLink role="menuitem" href="" Match="NavLinkMatch.All" @onclick="CloseNavMenu">About</NavLink>
+    </div>
+</header>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private void CloseNavMenu()
+    {
+        collapseNavMenu = true;
+    }
+}

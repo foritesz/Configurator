@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "YTqCQmCA2lo=",
+  "success": true,
+  "projectFilePath": "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\DTO\\DTO.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Wqeesda\\.nuget\\packages\\mongodb.bson\\3.4.0\\mongodb.bson.3.4.0.nupkg.sha512",
+    "C:\\Users\\Wqeesda\\.nuget\\packages\\system.memory\\4.5.5\\system.memory.4.5.5.nupkg.sha512",
+    "C:\\Users\\Wqeesda\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\5.0.0\\system.runtime.compilerservices.unsafe.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
