@@ -1,4 +1,6 @@
 ## ⚙️ Core Functionality
+
+In development...
 A full-stack project that works with World of Tanks data and displays it through a web interface. The application collects data from an external API and XML files, then converts it into a consistent and usable format.
 
 The backend processes and normalizes the data, handling differences between sources such as missing fields or different structures. The data is mapped into C# models and stored in MongoDB, allowing efficient querying.
