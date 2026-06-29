@@ -2851,11 +2851,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\BackEnd\\BackEnd.csproj",
+      "projectUniqueName": "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\BackEnd\\BackEnd.csproj",
       "projectName": "BackEnd",
-      "projectPath": "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\BackEnd\\BackEnd.csproj",
+      "projectPath": "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\BackEnd\\BackEnd.csproj",
       "packagesPath": "C:\\Users\\Wqeesda\\.nuget\\packages\\",
-      "outputPath": "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\BackEnd\\obj\\",
+      "outputPath": "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\BackEnd\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -2877,11 +2877,11 @@
           "framework": "net8.0",
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\DTO\\DTO.csproj": {
-              "projectPath": "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\DTO\\DTO.csproj"
+            "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\DTO\\DTO.csproj": {
+              "projectPath": "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\DTO\\DTO.csproj"
             },
-            "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\FrontEnd\\FrontEnd.csproj": {
-              "projectPath": "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\FrontEnd\\FrontEnd.csproj"
+            "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\FrontEnd\\FrontEnd.csproj": {
+              "projectPath": "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\FrontEnd\\FrontEnd.csproj"
             }
           }
         }
@@ -2955,7 +2955,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

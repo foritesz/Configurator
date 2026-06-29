@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\ApiCilentModels\" />
     <Folder Include="Logs\" />
     <Folder Include="Repositories\TankData\" />
   </ItemGroup>

@@ -52,12 +52,10 @@ namespace BackEnd.ApiClients
             if (tankIds == null || tankIds.Count == 0)
                 return new Dictionary<int, JsonElement>();
 
-            // maximum mennyiség, amit az API enged (például 100) - az API doc alapján módosítható
             const int maxBatchSize = 100;
 
             var tanksData = new Dictionary<int, JsonElement>();
 
-            // Lekérés darabolása batch-ekre, ha sok ID van
             for (int i = 0; i < tankIds.Count; i += maxBatchSize)
             {
                 var batchIds = tankIds.Skip(i).Take(maxBatchSize);
@@ -80,10 +78,7 @@ namespace BackEnd.ApiClients
                         }
                     }
                 }
-                else
-                {
-                    // Hibakezelés, logolás ide jöhet
-                }
+
             }
 
             return tanksData;
@@ -98,33 +93,31 @@ namespace BackEnd.ApiClients
 
             static string SanitizeFolderName(string name)
             {
-                // 1) whitespace eltávolítása
+
                 var noWs = new string(name.Where(c => !char.IsWhiteSpace(c)).ToArray());
 
-                // 2) érvénytelen fájlkarakterek + pont kiszűrése
+
                 var invalid = Path.GetInvalidFileNameChars().Concat(new[] { '.' }).ToHashSet();//the folder is become a bug and cannot be deleted without this!
                 var cleaned = new string(noWs.Where(c => !invalid.Contains(c)).ToArray());
 
-                // 3) fallback, ha üres marad
+
                 return string.IsNullOrWhiteSpace(cleaned) ? "UnknownTank" : cleaned;
             }
 
 
-            // --- Repositories gyökér feloldása ---
-            // 1) ha van környezeti változó, azt használjuk (Dockerben ajánlott)
+
             var envRoot = Environment.GetEnvironmentVariable("REPOSITORIES_ROOT");
 
-            // 2) ha nincs, próbáljunk egy "projekt-közeli" relatív útvonalat
-            // AppContext.BaseDirectory tipikusan bin/<cfg>/<tfm>, innen lépünk feljebb
+
             var defaultLocalRoot = Path.GetFullPath(
-                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Repositories", "TankData")//létre hozza a TankData mappát
+                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Repositories", "TankData")
             );
 
             string repositoriesRoot = Path.GetFullPath(
                string.IsNullOrWhiteSpace(envRoot) ? defaultLocalRoot : envRoot
             );
 
-            Directory.CreateDirectory(repositoriesRoot); // biztos, ami biztos
+            Directory.CreateDirectory(repositoriesRoot);
 
             var tanks = new List<TankData>();
 
@@ -153,7 +146,7 @@ namespace BackEnd.ApiClients
 
                 bool isPremium = GetBool(json, "is_premium");
 
-                // --- Mappastruktúra létrehozása ---
+
                 string safeName = SanitizeFolderName(name);
                 string tankFolder = Path.Combine(repositoriesRoot, "TankData", safeName);
 
@@ -185,7 +178,7 @@ namespace BackEnd.ApiClients
             }
        
 
-            // --- Upsert MongoDB-be ---
+
             var collection = _mongoDbContext.Tanks;
 
             foreach (var tank in tanks)
@@ -242,7 +235,7 @@ namespace BackEnd.ApiClients
                         EnginePower = engine?["power"]?.Value<int>() ?? 0,
                         GunName = gun?["name"]?.ToString() ?? "N/A",
                         GunCaliber = gun?["caliber"]?.Value<int>() ?? 0,
-                        FireRate = MathF.Round(gun?["fire_rate"]?.Value<float>() ?? 0f, 3),// a 3 a tízedes jegy
+                        FireRate = MathF.Round(gun?["fire_rate"]?.Value<float>() ?? 0f, 3),
                         HP = tank["hull_hp"]?.Value<int>() ?? 0,
                         HullHP = tank["hp"]?.Value<int>() ?? 0,
                         EngineWeight = engine?["weight"]?.Value<int>() ?? 0,

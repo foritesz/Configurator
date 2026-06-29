@@ -163,48 +163,5 @@ namespace BackEnd.Services.TankMatch
             }
             return d[s.Length, t.Length];
         }
-
-        /*public void ParseAndUpdateTankXmlFields()
-        {
-            if (_tankCollection == null)
-            {
-                // Itt már inkább loggolj:
-                Console.WriteLine("HIBA: _tankCollection null");
-                return;
-            }
-
-            var tanks = _tankCollection.Find(FilterDefinition<TankData>.Empty).ToList();
-
-            foreach (var tank in tanks)
-            {
-                if (tank == null || string.IsNullOrWhiteSpace(tank.XmlData))
-                {
-                    Console.WriteLine($"Kihagyott tank (nincs XML): {tank?.Name ?? "ismeretlen"}");
-                    continue;
-                }
-
-                bool updated = false;
-
-                var (forwardSpeed, backwardSpeed) = XmlParser.GetTankSpeeds(tank.XmlData);
-
-                if (tank.ForwardSpeed != forwardSpeed)
-                {
-                    tank.ForwardSpeed = forwardSpeed;
-                    updated = true;
-                }
-
-                if (tank.BackwardSpeed != backwardSpeed)
-                {
-                    tank.BackwardSpeed = backwardSpeed;
-                    updated = true;
-                }
-
-                if (updated)
-                {
-                    var filter = Builders<TankData>.Filter.Eq(t => t.TankId, tank.TankId);
-                    _tankCollection.ReplaceOne(filter, tank);
-                }
-            }
-        }*/
     }
 }

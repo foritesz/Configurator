@@ -44,11 +44,9 @@ namespace FrontEnd.Services.CrewServices
             if (arg == null)
                 return 0.0;
 
-            // ✅ ValueNum kezelés
             if (arg.ValueNum.HasValue && arg.ValueNum.Value != 0)
                 return arg.ValueNum.Value;
 
-            // fallback stringből
             if (!string.IsNullOrWhiteSpace(arg.ValueRaw) &&
                 double.TryParse(arg.ValueRaw, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed))
             {

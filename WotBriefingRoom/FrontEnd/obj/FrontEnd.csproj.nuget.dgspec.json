@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\FrontEnd\\FrontEnd.csproj": {}
+    "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\FrontEnd\\FrontEnd.csproj": {}
   },
   "projects": {
-    "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\DTO\\DTO.csproj": {
+    "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\DTO\\DTO.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\DTO\\DTO.csproj",
+        "projectUniqueName": "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\DTO\\DTO.csproj",
         "projectName": "DTO",
-        "projectPath": "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\DTO\\DTO.csproj",
+        "projectPath": "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\DTO\\DTO.csproj",
         "packagesPath": "C:\\Users\\Wqeesda\\.nuget\\packages\\",
-        "outputPath": "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\DTO\\obj\\",
+        "outputPath": "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\DTO\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -73,18 +73,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\FrontEnd\\FrontEnd.csproj": {
+    "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\FrontEnd\\FrontEnd.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\FrontEnd\\FrontEnd.csproj",
+        "projectUniqueName": "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\FrontEnd\\FrontEnd.csproj",
         "projectName": "FrontEnd",
-        "projectPath": "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\FrontEnd\\FrontEnd.csproj",
+        "projectPath": "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\FrontEnd\\FrontEnd.csproj",
         "packagesPath": "C:\\Users\\Wqeesda\\.nuget\\packages\\",
-        "outputPath": "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\FrontEnd\\obj\\",
+        "outputPath": "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\FrontEnd\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -106,8 +106,8 @@
             "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\DTO\\DTO.csproj": {
-                "projectPath": "C:\\Projects\\C#\\WotBriefingRoom\\WotBriefingRoom\\DTO\\DTO.csproj"
+              "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\DTO\\DTO.csproj": {
+                "projectPath": "C:\\Projects\\CSharp\\Configurator\\WotBriefingRoom\\DTO\\DTO.csproj"
               }
             }
           }
@@ -141,13 +141,13 @@
             "Microsoft.NET.ILLink.Tasks": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[8.0.27, )",
+              "version": "[8.0.28, )",
               "autoReferenced": true
             },
             "Microsoft.NET.Sdk.WebAssembly.Pack": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[10.0.8, )",
+              "version": "[10.0.9, )",
               "autoReferenced": true
             },
             "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
@@ -171,7 +171,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {

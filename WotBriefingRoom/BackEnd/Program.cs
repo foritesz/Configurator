@@ -19,7 +19,7 @@ Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
 
-// Serilog (útvonal mostantól /app/Logs)
+
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .WriteTo.Console()
@@ -39,16 +39,14 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-// 1) Bind config (appsettings + env)
-//   - ENV override: MONGODB_URI, MONGODB_DB
+
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.Configure<MongoDbSettings>(opts =>
 {
-    // appsettings alapérték
+
     builder.Configuration.GetSection("MongoDbSettings").Bind(opts);
 
-    // környezeti változók felülírhatják
     var envConn = builder.Configuration["MONGODB_URI"];
     var envDb = builder.Configuration["MONGODB_DB"];
     if (!string.IsNullOrWhiteSpace(envConn)) opts.ConnectionString = envConn;
@@ -56,7 +54,7 @@ builder.Services.Configure<MongoDbSettings>(opts =>
 });
 
 
-// 2) MongoClient + DbContext DI
+
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
     var s = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
@@ -87,7 +85,7 @@ if (!app.Environment.IsDevelopment())
 app.UseCors("frontend");
 app.MapControllers();
 
-// *** Példa: indításkor várjunk MONGO-ra retry-val (egyszerű, blokkolás nélkül) ***
+
 using (var scope = app.Services.CreateScope())
 {
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();

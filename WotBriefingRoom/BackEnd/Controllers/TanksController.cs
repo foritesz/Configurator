@@ -31,12 +31,6 @@ public class TanksController : ControllerBase
             if (page < 1) page = 1;
             if (pageSize < 1 || pageSize > 100) pageSize = 20;
 
-            /*var filter = string.IsNullOrWhiteSpace(search)
-                ? Builders<TankData>.Filter.Empty
-                : Builders<TankData>.Filter.Or(
-                    Builders<TankData>.Filter.Regex(x => x.Name, new MongoDB.Bson.BsonRegularExpression(search, "i")),
-                    Builders<TankData>.Filter.Regex(x => x.Type, new MongoDB.Bson.BsonRegularExpression(search, "i"))
-                );*/
 
             var safeSearch = Regex.Escape((search ?? "").Trim());
 

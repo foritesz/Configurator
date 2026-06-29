@@ -21,8 +21,8 @@ namespace BackEnd.Services.Bonuses
 
         }
 
-        // Fő belépési pont – mindent lefuttat
-        public async Task ImportAll() //async mert asnyc metodust használ
+
+        public async Task ImportAll()
         {
             await SafeRun(() =>
             {
@@ -54,7 +54,7 @@ namespace BackEnd.Services.Bonuses
                     Path.Combine(_basePath, "modifications.xml"),
                     Path.Combine(_basePath, "trees.xml"));
 
-                // LocName üres elemek kiszűrése mentés előtt
+
                 var filtered = merged.Where(m => !string.IsNullOrWhiteSpace(m.LocName)).ToList();
                 UpsertMany(_db.ModificationsTrees, filtered, x => x.Id);
             }, "modifications_trees");
@@ -206,9 +206,9 @@ namespace BackEnd.Services.Bonuses
 
             var treeDoc = XDocument.Load(treesPath);
 
-            // stepId -> (roleName, level, minVehicleLevel)
+
             var byStepId = new Dictionary<string, Tuple<string, byte, byte>>();
-            // unlockedId -> (roleName, unlockLevel, minVehicleLevel)
+
             var byUnlocks = new Dictionary<string, Tuple<string, byte, byte>>();
 
             foreach (var role in treeDoc.Root.Elements())
